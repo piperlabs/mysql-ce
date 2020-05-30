@@ -1,3 +1,64 @@
 schema-version: 1.0
 name: mysql-ce
 
+const:
+  product: mysql-{{ piper.fullVersion }}-linux-glibc2.12-x86_64
+  piper:
+    patchVersion: "{{ patch }}"
+
+var:
+  patch: "20"
+  user: mysql
+  group: mysql
+  datadir: /var/lib/mysql
+  basedir: /usr/local/mysql
+  port: 3306
+  rootpassword: "Password1$"
+  pid: /var/lib/mysql/mysql-ce-8.pid
+
+volumes:
+  - data:{{ datadir }}:.:{{ user }}
+
+ports:
+  - "{{ port }}"
+
+provision:
+  - url:
+     from: https://dev.mysql.com/get/Downloads/MySQL-8.0/{{ product }}.tar.xz
+     to: /usr/local
+     after: ln -s /usr/local/{{ product }} {{ basedir }}
+  - group: "{{ user }}"
+  - user:
+      name: "{{ user }}"
+      system: true
+      shell: /bin/false
+      group: mysql
+  - systempath: "{{ basedir }}/bin"
+  - folder:
+      path: "{{ basedir }}/mysql-files"
+      owner: "{{ user }}"
+      group: "{{ group }}"
+  - copy:
+      from: my.cnf
+      todir: /etc
+  - shell: 
+      inline: bin/mysqld --initialize-insecure
+      directory: "{{ basedir }}"
+  - shell:
+      inline: bin/mysqld_safe
+      directory: "{{ basedir }}"
+      async: true
+      condition: checkstarted.sh
+  - shell: changepassword.sh
+
+up: start
+
+down: stop
+  
+command:
+  start:
+    - shell: start.sh
+  stop:
+    - shell: stop.sh
+     
+
