@@ -45,8 +45,7 @@ provision:
       inline: bin/mysqld --initialize-insecure
       directory: "{{ basedir }}"
   - shell:
-      inline: bin/mysqld_safe
-      directory: "{{ basedir }}"
+      script: start.sh
       async: true
       condition: checkstarted.sh
   - shell: changepassword.sh
@@ -57,7 +56,11 @@ down: stop
   
 command:
   start:
-    - shell: start.sh
+    - shell:
+       script: start.sh
+       async: true
+       condition: checkstartedPassword.sh
+
   stop:
     - shell: stop.sh
      

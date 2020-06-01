@@ -1,7 +1,7 @@
 #!/bin/bash -e
+cd {{ .product.basedir }}
 
-pidfile="{{ .product.pid }}"
-if [ ! -f "$pidfile" ]
-then
+pid=`ps auxwww | grep "bin/mysqld" | grep -v grep | awk '{print $2}'`
+if [[ -z "$pid" ]]; then
   bin/mysqld
 fi

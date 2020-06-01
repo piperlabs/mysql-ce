@@ -1,19 +1,7 @@
 #!/bin/bash -e
 cd {{ .product.basedir }}
 
-pidfile="{{ .product.pid }}"
-if [ -f "$pidfile" ]
-then
-  pid=$(cat "$pidfile")
-  kill $pid
-  i=0
-  while [ -e "$pidfile" ]
-  do
-    i=$[$i+1]
-    sleep 1
-    if [ $i -eq 10 ]
-    then
-     kill -9 $pid
-    fi
-  done
+pid=`ps auxwww | grep "bin/mysqld" | grep -v grep | awk '{print $2}'`
+if [[ -n "$pid" ]]; then
+  bin/mysqladmin shutdown -p{{ .product.rootpassword }}
 fi
