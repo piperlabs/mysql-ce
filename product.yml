@@ -12,7 +12,7 @@ var:
   group: mysql
   datadir: /var/lib/mysql
   basedir: /usr/local/mysql
-  port: 3306
+  port: "3306"
   rootpassword: "Password1$"
   pid: /var/lib/mysql/mysql-ce-8.pid
 
