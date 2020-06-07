@@ -41,12 +41,8 @@ provision:
   - copy:
       from: my.cnf
       todir: /etc
-  - shell: 
-      inline: bin/mysqld --initialize-insecure
-      directory: "{{ basedir }}"
   - shell:
-      script: start.sh
-      async: true
+      script: prepare.sh
       condition: checkstarted.sh
   - shell: changepassword.sh
 
@@ -56,12 +52,13 @@ down: stop
   
 command:
   start:
-    - shell:
-       script: start.sh
-       async: true
-       condition: checkstartedPassword.sh
+    script: start.sh
+    condition: checkstartedPassword.sh
 
   stop:
-    - shell: stop.sh
+    container:
+      create: false
+    script: stop.sh
+
      
 
